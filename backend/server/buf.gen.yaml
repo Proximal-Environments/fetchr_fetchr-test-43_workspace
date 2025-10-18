@@ -1,0 +1,10 @@
+version: v1
+plugins:
+  - plugin: buf.build/community/stephenh-ts-proto
+    out: src/proto
+    opt:
+      - lowerCaseServiceMethods=true
+      # - outputServices=grpc-js,nice-grpc,default
+      # - outputServices=default
+      - outputServices=nice-grpc
+      - esModuleInterop=true

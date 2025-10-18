@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "base/base.proto";
+
+package mock;
+
+service MockService {
+  rpc GetMockProducts(GetMockProductsRequest) returns (GetMockProductsResponse);
+}
+
+message GetMockProductsRequest { int32 count = 1; }
+
+message GetMockProductsResponse { repeated base.Product products = 1; }

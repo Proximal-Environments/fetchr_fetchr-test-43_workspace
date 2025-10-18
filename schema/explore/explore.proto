@@ -1,0 +1,215 @@
+syntax = "proto3";
+
+package exploreServer;
+
+import "base/base.proto";
+
+service ExploreService {
+  // Create a new explore request
+  rpc CreateExploreRequest(CreateExploreRequestRequest)
+      returns (stream CreateExploreRequestResponse);
+
+  // V2 Explore Endpoint
+  rpc ProcessMessage(ProcessMessageRequest)
+      returns (stream ProcessMessageResponse);
+
+  rpc ReplyToChat(ReplyToChatRequest) returns (stream ReplyToChatResponse);
+
+  // Submit product preferences for a cohort
+  rpc SubmitProductPreference(SubmitPreferenceRequest)
+      returns (SubmitPreferenceResponse);
+
+  // Submit image preferences for a cohort
+  rpc SubmitImagePreference(SubmitImagePreferenceRequest)
+      returns (SubmitImagePreferenceResponse);
+
+  // Finalize image preferences for a cohort
+  rpc FinalizeImagePreferences(FinalizeImagePreferencesRequest)
+      returns (FinalizeImagePreferencesResponse);
+
+  // Delete product preferences for a cohort
+  rpc DeleteProductPreferenceCohort(DeleteCohortRequest)
+      returns (DeleteCohortResponse);
+
+  // Get explore request details
+  rpc GetExploreRequest(GetExploreRequestRequest)
+      returns (GetExploreRequestResponse);
+
+  // List explore requests
+  rpc ListExploreRequests(ListExploreRequestsRequest)
+      returns (ListExploreRequestsResponse);
+
+  rpc ListExploreRequestSummaries(ListExploreRequestSummariesRequest)
+      returns (ListExploreRequestSummariesResponse);
+
+  rpc AdminListAllExploreRequests(AdminListAllExploreRequestsRequest)
+      returns (AdminListAllExploreRequestsResponse);
+
+  // Dev endpoints
+  rpc DuplicateExploreRequest(DuplicateExploreRequestRequest)
+      returns (DuplicateExploreRequestResponse);
+  rpc DeleteExploreRequest(DeleteExploreRequestRequest)
+      returns (DeleteExploreRequestResponse);
+  rpc DeleteCohort(DeleteCohortRequest) returns (DeleteCohortResponse);
+  rpc GenerateStyles(StyleGenerationRequest) returns (StyleGenerationResponse);
+
+  // Search for products at a specific cohort
+  rpc SearchProductsAtCohort(SearchProductsAtCohortRequest)
+      returns (SearchProductsAtCohortResponse);
+}
+
+message ReplyToChatRequest {
+  string request_id = 1;
+  repeated base.PopulatedExploreMessage messages = 2;
+}
+
+message ReplyToChatResponse { base.PopulatedExploreRequestMessage message = 1; }
+
+message ListExploreRequestSummariesRequest {}
+
+message ListExploreRequestSummariesResponse {
+  repeated base.ExploreRequestSummary summaries = 1;
+}
+
+message FinalizeImagePreferencesRequest {
+  string request_id = 1;
+  string tool_id = 2;
+}
+
+message FinalizeImagePreferencesResponse { string message = 1; }
+
+message AdminListAllExploreRequestsRequest {
+  optional int32 page = 1;
+  optional int32 page_size = 2;
+}
+
+message AdminListAllExploreRequestsResponse {
+  repeated base.ExploreRequest requests = 1;
+}
+
+message ProcessMessageRequest {
+  string request_id = 1;
+  base.PopulatedExploreResponseMessage message = 2;
+}
+
+message ProcessMessageResponse {
+  base.PopulatedExploreRequestMessage message = 1;
+}
+
+// Request/Response messages
+message CreateExploreRequestRequest {
+  string query = 2;
+  optional float lower_budget = 3;
+  optional float upper_budget = 4;
+  repeated string brand_ids = 5;
+  optional base.ProductCategory category = 6;
+  optional base.Gender gender = 7;
+  optional bool is_dev_only = 8;
+  base.PopulatedExploreResponseMessage message = 9;
+  optional string id = 10;
+  optional string product_id = 11;
+}
+
+message CreateExploreRequestResponse {
+  oneof response {
+    ExploreRequestResult explore_request_result = 1;
+    ProcessMessageResponse process_message_response = 2;
+  }
+}
+
+message ExploreRequestResult { base.ExploreRequest request = 1; }
+
+message Done {}
+
+message MessageResult { string message = 1; }
+
+message StatusUpdate { string status = 1; }
+
+message ProductsResult {
+  repeated base.ProductWithScoreAndSearchQuery products = 1;
+  repeated base.ProductWithSearchQuery unranked_products = 2;
+  repeated string intermediate_queries = 3;
+}
+
+message SubmitImagePreferenceRequest {
+  string tool_id = 1;
+  string request_id = 2;
+  repeated base.ImagePreferenceItem preference_items = 3;
+}
+
+message SubmitImagePreferenceResponse { string message = 1; }
+
+message SubmitPreferenceRequest {
+  string tool_id = 1;
+  string request_id = 2;
+  repeated base.ProductPreferenceItem preference_items = 3;
+}
+
+message SubmitPreferenceResponse { string message = 1; }
+
+message DeleteCohortRequest {
+  string request_id = 1;
+  int32 cohort = 2;
+}
+
+message DeleteCohortResponse { string message = 1; }
+
+message GetExploreRequestRequest { string request_id = 1; }
+
+message GetExploreRequestResponse {
+  base.ExploreRequest request = 1;
+  map<int32, CohortData> cohorts = 2;
+}
+
+message CohortData {
+  repeated base.ProductWithSearchQueryAndPreference products = 1;
+  repeated string intermediate_queries = 2;
+  repeated base.ProductWithSearchQuery unranked_products = 3;
+}
+
+message ListExploreRequestsRequest {
+  optional bool include_dev_only_requests = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
+}
+
+message ListExploreRequestsResponse {
+  repeated base.ExploreRequest requests = 1;
+}
+
+message DuplicateExploreRequestRequest { string request_id = 1; }
+
+message DuplicateExploreRequestResponse { string new_request_id = 1; }
+
+message DeleteExploreRequestRequest { string request_id = 1; }
+
+message DeleteExploreRequestResponse { string message = 1; }
+
+message StyleGenerationRequest {
+  string query = 1;
+  base.Gender gender = 2;
+  int32 num_products = 3;
+  optional string search_method = 4;
+  optional base.ProductCategory category = 5;
+}
+
+message StyleGenerationResponse {
+  repeated base.ProductWithSearchQuery styles = 1;
+  optional string message = 2;
+}
+
+message SearchProductsAtCohortRequest {
+  string request_id = 1;
+  int32 cohort = 2;
+  string query = 3;
+  optional int32 num_products = 4;
+  optional bool filter_out_seen_products = 5;
+}
+
+message SearchProductsAtCohortResponse {
+  repeated base.ProductWithScoreAndSearchQuery ranked_products =
+      1; // Reranked results based on user preferences
+  repeated string intermediate_queries = 2;
+  repeated base.ProductWithScoreAndSearchQuery unranked_products =
+      3; // Original search results before reranking
+}

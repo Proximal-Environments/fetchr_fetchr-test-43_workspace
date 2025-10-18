@@ -1,0 +1,41 @@
+syntax = "proto3";
+import "base/comments.proto";
+
+package automation;
+
+service AutomationService {
+  rpc RateProductForPurchase(RateProductForPurchaseRequest)
+      returns (RateProductForPurchaseResponse);
+  rpc CreateThreadOnProductPurchaseSuggestion(
+      CreateThreadOnProductPurchaseSuggestionRequest)
+      returns (CreateThreadOnProductPurchaseSuggestionResponse);
+  rpc ResolveThread(ResolveThreadRequest) returns (ResolveThreadResponse);
+  rpc RespondToThread(RespondToThreadRequest) returns (RespondToThreadResponse);
+}
+
+message ResolveThreadRequest { int32 thread_id = 1; }
+
+message ResolveThreadResponse {}
+
+message RespondToThreadRequest {
+  int32 thread_id = 1;
+  string content = 2;
+}
+
+message RespondToThreadResponse {}
+
+message CreateThreadOnProductPurchaseSuggestionRequest {
+  string product_purchase_suggestion_id = 1;
+  comments.ThreadType thread_type = 4;
+  string content = 5;
+}
+
+message CreateThreadOnProductPurchaseSuggestionResponse {}
+
+message RateProductForPurchaseRequest {
+  string product_id = 1;
+  optional string order_id = 2;
+  string chat_id = 3;
+}
+
+message RateProductForPurchaseResponse { string response = 1; }

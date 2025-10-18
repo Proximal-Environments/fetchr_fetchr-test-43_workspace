@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package cart;
+
+import "google/protobuf/timestamp.proto";
+import "base/base.proto";
+
+// Server
+service CartService {
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+  rpc ClearCart(ClearCartRequest) returns (ClearCartResponse);
+  rpc AddProduct(AddProductRequest) returns (AddProductResponse);
+  rpc RemoveProduct(RemoveProductRequest) returns (RemoveProductResponse);
+  rpc GetCartProducts(GetCartRequest) returns (GetCartProductsResponse);
+
+  rpc GetOrderCart(GetOrderCartRequest) returns (GetOrderCartResponse);
+  rpc AddProductToOrderCart(AddProductToOrderCartRequest)
+      returns (AddProductToOrderCartResponse);
+  rpc RemoveProductFromOrderCart(RemoveProductFromOrderCartRequest)
+      returns (RemoveProductFromOrderCartResponse);
+  rpc ClearOrderCart(ClearOrderCartRequest) returns (ClearOrderCartResponse);
+  rpc UpdateProductInOrderCart(UpdateProductInOrderCartRequest)
+      returns (UpdateProductInOrderCartResponse);
+  rpc AddOrderSuggestionItemsToCart(AddOrderSuggestionItemsToCartRequest)
+      returns (AddOrderSuggestionItemsToCartResponse);
+}
+
+message AddOrderSuggestionItemsToCartRequest {
+  string order_id = 1;
+  string order_suggestion_id = 2;
+}
+
+message AddOrderSuggestionItemsToCartResponse { OrderCart order_cart = 1; }
+
+message UpdateProductInOrderCartRequest {
+  string order_id = 1;
+  string product_id = 2;
+  optional string recommended_size = 3;
+  optional double original_price = 4;
+  optional double current_price = 5;
+  optional string recommended_color = 6;
+}
+
+message UpdateProductInOrderCartResponse { OrderCart order_cart = 1; }
+
+message OrderCartProduct {
+  base.Product product = 1;
+  optional string recommended_size = 2;
+  optional double original_price = 3;
+  double current_price = 4;
+  optional string recommended_color = 5;
+}
+
+message GetOrderCartRequest { string order_id = 1; }
+
+message GetOrderCartResponse { OrderCart order_cart = 1; }
+
+message AddProductToOrderCartRequest {
+  string order_id = 1;
+  string product_id = 2;
+}
+
+message AddProductToOrderCartResponse { OrderCart order_cart = 1; }
+
+message RemoveProductFromOrderCartRequest {
+  string order_id = 1;
+  string product_id = 2;
+}
+
+message RemoveProductFromOrderCartResponse { OrderCart order_cart = 1; }
+
+message ClearOrderCartRequest { string order_id = 1; }
+
+message ClearOrderCartResponse { OrderCart order_cart = 1; }
+
+message OrderCart {
+  string id = 1;
+  string order_id = 2;
+  repeated OrderCartProduct products = 3;
+  string stylist_note = 4;
+}
+
+// Shared Types
+message Cart {
+  string id = 1;
+  string user_id = 2;
+  repeated base.Product products = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+// Request Types
+message GetCartRequest { string user_id = 1; }
+
+message GetCartResponse { Cart cart = 1; }
+
+message ClearCartRequest { string user_id = 1; }
+
+message ClearCartResponse { Cart cart = 1; }
+
+message AddProductRequest {
+  string user_id = 1;
+  string product_id = 2;
+}
+
+message AddProductResponse { Cart cart = 1; }
+
+message RemoveProductRequest {
+  string user_id = 1;
+  string product_id = 2;
+}
+
+message RemoveProductResponse { Cart cart = 1; }
+
+message UpdateProductQuantityRequest {
+  string user_id = 1;
+  string product_id = 2;
+  int32 quantity = 3;
+}
+
+message GetCartProductsResponse { repeated base.Product products = 1; }
+
+message CartProductList { repeated base.Product products = 1; }
+
+message CreateCartRequest { string user_id = 1; }
+
+message CreateCartResponse { Cart cart = 1; }

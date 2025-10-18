@@ -1,0 +1,976 @@
+syntax = "proto3";
+
+package base;
+
+import "base/comments.proto";
+import "core/core.proto";
+import "base/user_billing.proto";
+
+message ProductWithSearchQuery {
+  Product product = 1;
+  string query = 2;
+}
+
+enum ProductCategory {
+  PRODUCT_CATEGORY_UNSPECIFIED = 0;
+  PRODUCT_CATEGORY_TOPS = 1;
+  PRODUCT_CATEGORY_BOTTOMS = 2;
+  PRODUCT_CATEGORY_ACCESSORIES = 3;
+  PRODUCT_CATEGORY_SHOES = 4;
+  PRODUCT_CATEGORY_DRESSES = 5;
+  PRODUCT_CATEGORY_UNDERWEAR = 6;
+  PRODUCT_CATEGORY_OTHER = 7;
+}
+
+enum PreferenceType {
+  UNSPECIFIED = 0;
+  LIKE = 1;
+  DISLIKE = 2;
+  SUPERLIKE = 3;
+  MAYBE = 4;
+}
+
+enum Gender {
+  GENDER_UNSPECIFIED = 0;
+  GENDER_UNISEX = 1;
+  GENDER_MALE = 2;
+  GENDER_FEMALE = 3;
+}
+
+enum ProductFit {
+  PRODUCT_FIT_UNSPECIFIED = 0;
+  PRODUCT_FIT_SLIM = 1;
+  PRODUCT_FIT_REGULAR = 2;
+  PRODUCT_FIT_LOOSE = 3;
+  PRODUCT_FIT_RELAXED = 4;
+  PRODUCT_FIT_OVERSIZED = 5;
+  PRODUCT_FIT_ATHLETIC = 6;
+  PRODUCT_FIT_TAILORED = 7;
+  PRODUCT_FIT_BAGGY = 8;
+  PRODUCT_FIT_CROPPED = 9;
+}
+
+enum UserRole {
+  USER_ROLE_CUSTOMER = 0;
+  USER_ROLE_STYLIST = 1;
+  USER_ROLE_ADMIN = 2;
+  USER_ROLE_SUPER_STYLIST = 3;
+}
+
+message Product {
+  string id = 1;
+  string brand_id = 2;
+  string brand_name = 3;
+  optional string sub_brand_id = 23;
+  optional string sub_brand_name = 22;
+  string url = 4;
+  repeated string image_urls = 5;
+  repeated string s3_image_urls = 6;
+  string title = 7;
+  float price = 8;
+  Gender gender = 9;
+  repeated string sizes = 10;
+  string description = 11;
+  optional string generated_description = 12;
+  string full_generated_description = 13;
+  repeated string colors = 14;
+  repeated string materials = 15;
+  optional ProductCategory category = 16;
+  optional string style = 17;
+  optional string details = 18;
+  optional ProductFit fit = 19;
+  string name = 20;
+  repeated string compressed_image_urls = 21;
+  bool is_kid_product = 24;
+  message ScrapingMetadata {
+    optional bool content_quality_check = 1;
+    optional string pipeline_run_id = 2;
+  }
+  ScrapingMetadata scraping_metadata = 25;
+  optional bool manually_added = 26;
+  repeated string highres_webp_urls = 27;
+  optional float original_price = 28;
+}
+
+message ProductWithScore {
+  Product product = 1;
+  float score = 2;
+}
+
+message ProductWithScoreAndSearchQuery {
+  Product product = 1;
+  float score = 2;
+  string query = 3;
+}
+
+message UserMetadata {
+  optional Gender gender = 1;
+  optional int32 age = 2;
+  optional int32 weight = 3;
+  optional int32 height = 4;
+}
+
+message Name {
+  optional string first_name = 1;
+  optional string last_name = 2;
+}
+
+enum MembershipType {
+  MEMBERSHIP_TYPE_UNSPECIFIED = 0;
+  MEMBERSHIP_TYPE_FREE = 1;
+  MEMBERSHIP_TYPE_PRO = 2;
+}
+
+message UserProfile {
+  string id = 1;
+  optional UserMetadata metadata = 2;
+  optional Name name = 3;
+  optional SocialLinks social_links = 4;
+  bool is_onboarding_completed = 5;
+  optional UserAddress address = 6;
+  optional string email = 7;
+  bool is_push_notifications_enabled = 8;
+  optional UserSizing sizing = 9;
+  int64 created_at = 10;
+  UserRole role = 11;
+  optional string phone_number = 12;
+  optional MembershipType membership_type = 13;
+  repeated string style_image_urls = 14;
+  repeated string favorite_brands = 15;
+  GeneratedProfileDescription generated_profile_description = 16;
+  optional string first_order_query = 17;
+  repeated UserDevice devices = 18;
+  optional WhatBringsYouToFetchr what_brings_you_to_fetchr = 21;
+  optional string preferences_and_quirks = 22;
+  repeated string style_picker_product_ids = 23;
+  optional string selfonboarded_generated_style_description = 24;
+  base.UserBilling billing = 25;
+}
+
+enum Platform {
+  PLATFORM_UNSPECIFIED = 0;
+  PLATFORM_IOS = 1;
+  PLATFORM_ANDROID = 2;
+  PLATFORM_WEB = 3;
+}
+
+message UserDevice {
+  string device_id = 1;
+  bool notification_enabled = 2;
+  Platform platform = 3;
+}
+
+message GeneratedProfileDescription {
+  optional string description = 1;
+  optional int64 last_updated_at_num_product_preferences = 2;
+  optional string hash = 3;
+  optional bool did_tried_to_populate_bio_from_pending_register_table = 4;
+}
+
+message SocialLinks { optional string instagram_handle = 1; }
+
+enum SizeTop {
+  SIZE_TOP_UNSPECIFIED = 0;
+  SIZE_TOP_XS = 1;
+  SIZE_TOP_S = 2;
+  SIZE_TOP_M = 3;
+  SIZE_TOP_L = 4;
+  SIZE_TOP_XL = 5;
+  SIZE_TOP_XXL = 6;
+}
+
+enum SizeBottom {
+  SIZE_BOTTOM_UNSPECIFIED = 0;
+  SIZE_BOTTOM_XS = 1;
+  SIZE_BOTTOM_S = 2;
+  SIZE_BOTTOM_M = 3;
+  SIZE_BOTTOM_L = 4;
+  SIZE_BOTTOM_XL = 5;
+}
+
+enum SizeWaist {
+  SIZE_WAIST_UNSPECIFIED = 0;
+  SIZE_WAIST_XS = 1;
+  SIZE_WAIST_S = 2;
+  SIZE_WAIST_M = 3;
+  SIZE_WAIST_L = 4;
+  SIZE_WAIST_XL = 5;
+}
+
+enum SizeBust {
+  SIZE_BUST_UNSPECIFIED = 0;
+  SIZE_BUST_XS = 1;
+  SIZE_BUST_S = 2;
+  SIZE_BUST_M = 3;
+  SIZE_BUST_L = 4;
+  SIZE_BUST_XL = 5;
+}
+
+enum SizeDress {
+  SIZE_DRESS_UNSPECIFIED = 0;
+  SIZE_DRESS_XS = 1;
+  SIZE_DRESS_S = 2;
+  SIZE_DRESS_M = 3;
+  SIZE_DRESS_L = 4;
+  SIZE_DRESS_XL = 5;
+}
+
+enum SizeShoes {
+  SIZE_SHOES_UNSPECIFIED = 0;
+  SIZE_SHOES_XS = 1;
+  SIZE_SHOES_S = 2;
+  SIZE_SHOES_M = 3;
+  SIZE_SHOES_L = 4;
+  SIZE_SHOES_XL = 5;
+}
+
+enum DiscoveryMethod {
+  TWITTER = 0;
+  INSTAGRAM = 1;
+  APP_STORE = 2;
+  FRIENDS = 3;
+  WEB_SEARCH = 4;
+  OTHER = 5;
+}
+
+enum WhatBringsYouToFetchr {
+  WHAT_BRINGS_YOU_TO_FETCHR_UNSPECIFIED = 0;
+  WHAT_BRINGS_YOU_TO_FETCHR_EXPLORE_STYLE = 1;
+  WHAT_BRINGS_YOU_TO_FETCHR_WORK_WITH_STYLIST = 2;
+  WHAT_BRINGS_YOU_TO_FETCHR_LOOKING_FOR_ITEM = 3;
+}
+
+enum AppEnvironment {
+  APP_ENVIRONMENT_UNSPECIFIED = 0;
+  APP_ENVIRONMENT_DEV = 1;
+  APP_ENVIRONMENT_TEST_FLIGHT = 2;
+  APP_ENVIRONMENT_PROD = 3;
+}
+
+message UserSizing {
+  optional SizeTop tops = 1;
+  optional string bottoms = 2;
+  optional string waist = 3;
+  optional string bust = 4;
+  optional string dress = 5;
+  optional string shoes = 6;
+  optional string hips = 7;
+  optional string inseam = 8;
+  optional bool waist_approximate = 9;
+  optional bool hips_approximate = 10;
+  optional bool inseam_approximate = 11;
+  optional bool bust_approximate = 12;
+}
+
+message UserAddress {
+  optional string address_line_one = 1;
+  optional string address_line_two = 2;
+  optional string city = 3;
+  optional string state = 4;
+  optional string country = 5;
+  optional string postal_code = 6;
+}
+
+message UserProductPreference {
+  string id = 1;
+  optional PreferenceType preference_type = 2;
+  string user_id = 3;
+  string product_id = 4;
+  string request_id = 5;
+  int32 cohort = 6;
+  optional string query = 7;
+  optional string comments = 8;
+}
+
+message PopulatedUserProductPreference {
+  UserProductPreference preference = 1;
+  Product product_details = 2;
+}
+
+message StringList { repeated string values = 1; }
+
+message ProductWithSearchQueryAndPreference {
+  Product product = 1;
+  ProductPreferenceItem preference_item = 2;
+  string query = 3;
+}
+
+message ProductPreferenceItem {
+  string item_id = 1;
+  PreferenceType preference_type = 2;
+  optional string comments = 3;
+}
+
+message PopulatedProductPreferenceItem {
+  ProductPreferenceItem preference_item = 1;
+  Product product = 2;
+}
+
+enum ExploreMessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TYPE_BASIC = 1;
+  MESSAGE_TYPE_PRODUCT_PREFERENCES_TOOL_USAGE_REQUEST = 2;
+  MESSAGE_TYPE_PRODUCT_PREFERENCES_TOOL_USAGE_RESPONSE = 3;
+  MESSAGE_TYPE_PRODUCT_CHOICE_TOOL_USAGE_REQUEST = 4;
+  MESSAGE_TYPE_PRODUCT_CHOICE_TOOL_USAGE_RESPONSE = 5;
+  MESSAGE_TYPE_TOOL_USE_REQUEST = 6;
+  MESSAGE_TYPE_TOOL_USE_RESPONSE = 7;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_INITIATED = 1;
+  ORDER_STATUS_WAITING_FOR_STYLIST = 2;
+  ORDER_STATUS_WAITING_FOR_USER_FEEDBACK = 3;
+  ORDER_STATUS_TO_BE_PURCHASED = 4;
+  ORDER_STATUS_PURCHASED = 5;
+  ORDER_STATUS_SHIPPING_IN_TRANSIT = 6;
+  ORDER_STATUS_DELIVERED = 7;
+  ORDER_STATUS_CANCELLED = 8;
+  ORDER_STATUS_REFUNDED = 9;
+}
+message ProductRecommendation {
+  string product_name = 1;
+  bool is_selected = 2;
+}
+
+message ProductPurchase {
+  string id = 1;
+  string product_id = 2;
+  string size = 3;
+  float price = 4;
+  optional float original_price = 5;
+  optional bool is_refundable = 6;
+  optional UserProductPurchaseFeedback user_feedback = 7;
+  optional RefundStatus refund_status = 8;
+  optional Product product = 9;
+  string color = 10;
+  PaymentStatus payment_status = 11;
+  optional string stripe_payment_id = 12;
+  bool is_archived = 13;
+  optional string archive_reason = 14;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_NOT_PAID = 1;
+  PAYMENT_STATUS_PAID = 2;
+  PAYMENT_STATUS_PAYMENT_DENIED = 3;
+}
+
+enum RefundStatus {
+  REFUND_STATUS_UNSPECIFIED = 0;
+  REFUND_STATUS_PENDING_USER_FEEDBACK = 1;
+  REFUND_STATUS_DEADLINE_EXPIRED = 2;
+  REFUND_STATUS_REQUESTED = 3;
+  REFUND_STATUS_REQUESTED_ITEM_PICKED_UP = 4;
+  REFUND_STATUS_REQUESTED_SHIPPED_BACK = 5;
+  REFUND_STATUS_REQUESTED_NON_REFUNDABLE_ITEM = 6;
+  REFUND_STATUS_ITEM_KEPT = 7;
+}
+
+enum ProductPurchaseFeedbackCategory {
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_UNSPECIFIED = 0;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_FIT_SIZING = 1;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_STYLE_COLOR = 2;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_QUALITY_ISSUE = 3;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_DAMAGED_DEFECTIVE = 4;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_NO_LONGER_NEEDED = 5;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_OTHER = 6;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_GOOD_FIT = 7;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_GOOD_COLOR = 8;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_HIGH_QUALITY_FABRIC = 9;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_GOOD_VALUE = 10;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_MATCHES_WARDROBE = 11;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_LIKE_BRAND = 12;
+  PRODUCT_PURCHASE_FEEDBACK_CATEGORY_GOOD_OTHER = 13;
+}
+
+message UserProductPurchaseFeedback {
+  optional string feedback = 1;
+  optional string refund_reason = 2;
+  repeated ProductPurchaseFeedbackCategory categories = 3;
+}
+
+enum OrderSuggestionStatus {
+  ORDER_SUGGESTION_STATUS_UNSPECIFIED = 0;
+  ORDER_SUGGESTION_STATUS_PENDING = 1;
+  ORDER_SUGGESTION_STATUS_REVIEWED = 2;
+  ORDER_SUGGESTION_STATUS_ARCHIVED = 3;
+  ORDER_SUGGESTION_STATUS_DRAFT = 4;
+}
+
+message ProductPurchaseSuggestion {
+  string id = 1;
+  string product_id = 2;
+  string size = 3;
+  float price = 4;
+  optional float original_price = 5;
+  optional bool is_refundable = 6;
+  Product product = 8;
+  bool is_accepted = 7;
+  optional string note = 9; // User feedback note
+  string color = 10;
+  ProductPurchaseSuggestionStatus status = 11;
+  optional string ai_judge_analysis = 12;
+  bool is_archived = 13;
+  optional string archive_reason = 14;
+  optional InternalProductPurchaseSuggestionData internal_data = 15;
+}
+
+enum ProductPurchaseSuggestionStatus {
+  PRODUCT_PURCHASE_SUGGESTION_STATUS_UNSPECIFIED = 0;
+  PRODUCT_PURCHASE_SUGGESTION_STATUS_PENDING = 1;
+  PRODUCT_PURCHASE_SUGGESTION_STATUS_ACCEPTED = 2;
+  PRODUCT_PURCHASE_SUGGESTION_STATUS_REJECTED = 3;
+}
+
+enum ShipmentStatus {
+  SHIPMENT_STATUS_UNSPECIFIED = 0;
+  SHIPMENT_STATUS_PENDING_SHIPPING = 1;
+  SHIPMENT_STATUS_SHIPPING = 2;
+  SHIPMENT_STATUS_DELIVERED = 3;
+  SHIPMENT_STATUS_CANCELLED_BY_STORE = 4;
+}
+
+message Shipment {
+  string id = 1;
+  string order_id = 2;
+  Brand brand = 3;
+  repeated ProductPurchase product_purchases = 4;
+  ShipmentStatus status = 5;
+
+  // Shipment tracking info
+  optional string brand_order_id = 6;
+  optional string tracking_number = 7;
+  optional string tracking_url = 8;
+  optional int64 expected_delivery_date_start = 9;
+  optional int64 expected_delivery_date_end = 10;
+  optional int64 delivered_at = 11;
+  optional string email = 12;
+  repeated string possible_tracking_numbers = 13;
+  optional float total_price = 14;
+  optional float shipping_cost = 15;
+  optional string stripe_payment_id = 16;
+}
+
+message PopulatedOrderSuggestion {
+  string id = 1;
+  int64 created_at = 2;
+  OrderSuggestionStatus status = 3;
+  repeated ProductPurchaseSuggestion product_suggestions = 4;
+  repeated Shipment shipments = 5;
+  OrderSuggestionDetailedStatus detailed_status = 6;
+  optional int64 verify_suggestions_by = 7;
+  optional int64 verify_purchases_by = 8;
+  optional int64 expire_suggestions_by = 9;
+  optional string stylist_note = 10;
+  optional string ai_judge_analysis = 11;
+  optional InternalOrderSuggestionData internal_data = 12;
+}
+
+message InternalProductPurchaseSuggestionData {
+  repeated comments.Thread threads = 1;
+}
+
+message InternalOrderSuggestionData { repeated comments.Thread threads = 1; }
+
+enum OrderType {
+  ORDER_TYPE_USER_INITIATED = 0;
+  ORDER_TYPE_FETCHR_INITIATED = 1;
+}
+
+message OrderSummary {
+  string id = 1;
+  string customer_id = 2;
+  optional string stylist_id = 3;
+  optional string chat_id = 4;
+  OrderStatus status = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+  base.UserProfile customer = 8;
+  optional base.UserProfile stylist = 9;
+  int32 user_view_version = 11;
+  DashboardMetadata dashboard_metadata = 12;
+  optional string note = 13;
+  repeated ProductRecommendation product_recommendations = 14;
+  repeated PopulatedOrderSuggestion order_suggestions = 15;
+  optional OrderType type = 16;
+  optional string generated_title = 17;
+}
+
+enum OrderSuggestionDetailedStatus {
+  ORDER_SUGGESTION_DETAILED_STATUS_UNSPECIFIED = 0;
+  ORDER_SUGGESTION_DETAILED_STATUS_FINDING_ITEMS = 1;
+  ORDER_SUGGESTION_DETAILED_STATUS_PENDING_VERIFICATION = 2;
+  ORDER_SUGGESTION_DETAILED_STATUS_MODIFYING_ITEMS = 3;
+  ORDER_SUGGESTION_DETAILED_STATUS_PENDING_PURCHASE = 4;
+  ORDER_SUGGESTION_DETAILED_STATUS_SHIPPING = 5;
+  ORDER_SUGGESTION_DETAILED_STATUS_DELIVERED = 6;
+}
+
+message StylistSuggestionSummary {
+  MainStylistSuggestion main_suggestion = 1;
+  repeated SecondaryStylistSuggestion secondary_suggestions = 2;
+}
+
+message ExploreRequest {
+  string id = 1;
+  string user_id = 2;
+  string query = 3;
+  optional float lower_budget = 4;
+  optional float upper_budget = 5;
+  repeated string brand_ids = 6;
+  optional ProductCategory category = 7;
+  Gender gender = 8;
+  optional string generated_title = 9;
+  optional bool dev_is_dev_only = 10;
+  optional bool dev_is_deleted = 11;
+  string created_at = 12;
+  repeated PopulatedExploreMessage messages = 13;
+  optional string status = 16;
+  optional ExploreRequestType request_type = 17;
+  optional string product_id = 18;
+}
+
+message ExploreRequestSummary {
+  string id = 1;
+  string query = 2;
+  string created_at = 3;
+  optional string generated_title = 4;
+}
+
+message DashboardMetadata { bool is_starred = 1; }
+
+message ProductChoiceToolUsageRequest { repeated string product_ids = 1; }
+
+message ProductChoiceToolUsageResponse { string chosen_product_id = 1; }
+
+message PredefinedRequestMessage {
+  core.Message message = 1;
+  repeated string suggested_responses = 2;
+}
+
+message PopulatedExploreRequestMessage {
+  oneof message {
+    core.Message basic_message = 1;
+    ProductPreferencesRequestPopulatedMessage
+        product_preferences_request_message = 2;
+    FinishFindingProductRequestPopulatedMessage
+        finish_finding_product_request_message = 3;
+    UpdateStatusMessage update_status_message = 4;
+    GridProductsRequestPopulatedMessage grid_products_request_message = 5;
+    GridImagesRequestPopulatedMessage grid_images_request_message = 6;
+    PlaceOrderRequestPopulatedMessage place_order_request_message = 7;
+    PredefinedRequestMessage predefined_request_message = 8;
+    // ProductChoiceRequestPopulatedMessage product_choice_request_message = 4;
+  }
+}
+
+message PlaceOrderRequestPopulatedMessage {
+  string order_id = 1;
+  OrderSummary order_summary = 2;
+}
+
+message GridImagesRequestPopulatedMessage {
+  repeated ImageWithWidthAndHeight image_urls = 1;
+  string tool_use_id = 2;
+}
+
+message ImageWithWidthAndHeight {
+  string image_url = 1;
+  int32 width = 2;
+  int32 height = 3;
+}
+
+message ImagePreferenceItem {
+  string image_url = 1;
+  PreferenceType preference_type = 2;
+}
+
+message ImagePreferenceItemWithStyle {
+  ImagePreferenceItem image_preference_item = 1;
+  string style = 2;
+}
+
+message PopulatedImagePreferenceItem {
+  ImagePreferenceItem image_preference_item = 1;
+  repeated float embeddings = 2;
+  optional string style = 3;
+}
+
+message GridImagesResponsePopulatedMessage {
+  repeated ImagePreferenceItemWithStyle image_preference_items = 1;
+  string tool_use_id = 2;
+}
+
+message GridProductsRequestPopulatedMessage {
+  repeated ProductWithScoreAndSearchQuery products = 1;
+  repeated ProductWithSearchQuery unranked_products = 2;
+  repeated string intermediate_queries = 3;
+  string tool_use_id = 4;
+}
+
+message PopulatedOrderManagementMessage {
+  oneof message {
+    SendStylistSuggestionsRequest stylist_suggestions_request_message = 2;
+    SendStylistSuggestionsResponse stylist_suggestions_response_message = 3;
+  }
+}
+
+message PopulatedOrderManagementRequestMessage {
+  oneof message {
+    SendStylistSuggestionsRequest stylist_suggestions_request_message = 1;
+  }
+}
+
+message GridProductsResponsePopulatedMessage {
+  repeated ProductPreferenceItem preferences = 1;
+  string tool_use_id = 2;
+}
+
+message PopulatedOrderManagementResponseMessage {
+  oneof message {
+    SendStylistSuggestionsResponse stylist_suggestions_response_message = 1;
+  }
+}
+
+message PopulatedExploreResponseMessage {
+  oneof message {
+    core.Message basic_message = 1;
+    ProductPreferencesResponsePopulatedMessage
+        product_preferences_response_message = 2;
+    GridProductsResponsePopulatedMessage grid_products_response_message = 4;
+    GridImagesResponsePopulatedMessage grid_images_response_message = 5;
+    // ProductChoiceResponsePopulatedMessage product_choice_response_message =
+    // 3;
+  }
+}
+
+message ProductSuggestion {
+  string product_name = 1;
+  bool is_selected = 2;
+}
+
+message FinishFindingProductRequestPopulatedMessage {
+  repeated string user_requirements = 2;
+  repeated ProductSuggestion product_suggestions = 3;
+  optional string message = 4;
+}
+
+message ProductPreferencesRequestPopulatedMessage {
+  repeated ProductWithScoreAndSearchQuery products = 1;
+  repeated ProductWithSearchQuery unranked_products = 2;
+  repeated string intermediate_queries = 3;
+  string tool_use_id = 4;
+}
+
+message ProductPreferencesResponsePopulatedMessage {
+  repeated ProductPreferenceItem preferences = 1;
+  string tool_use_id = 2;
+}
+
+message ProductChoiceRequestPopulatedMessage { repeated Product products = 1; }
+
+message ProductChoiceResponsePopulatedMessage { Product chosen_product = 1; }
+
+message PopulatedExploreMessage {
+  oneof message {
+    core.Message basic_message = 1;
+    ProductPreferencesRequestPopulatedMessage
+        product_preferences_request_message = 2;
+    ProductPreferencesResponsePopulatedMessage
+        product_preferences_response_message = 3;
+    FinishFindingProductRequestPopulatedMessage
+        finish_finding_product_request_message = 4;
+    UpdateStatusMessage update_status_message = 5;
+    GridProductsRequestPopulatedMessage grid_products_request_message = 6;
+    GridProductsResponsePopulatedMessage grid_products_response_message = 7;
+    GridImagesRequestPopulatedMessage grid_images_request_message = 8;
+    GridImagesResponsePopulatedMessage grid_images_response_message = 9;
+    PlaceOrderRequestPopulatedMessage place_order_request_message = 10;
+    PredefinedRequestMessage predefined_request_message = 11;
+  }
+}
+
+message UpdateStatusMessage { optional string status_string = 1; }
+
+message SendStylistSuggestionsRequest {
+  string order_id = 1;
+  MainStylistSuggestion main_suggestion = 2;
+  repeated SecondaryStylistSuggestion secondary_suggestions = 3;
+}
+
+message MainStylistSuggestion {
+  string product_id = 1;
+  string recommended_size = 2;
+  SuggestionReasoning suggestion_reasoning = 3;
+  float current_price = 4;
+  optional float original_price = 5;
+  optional Product product = 6;
+  string product_copy = 7;
+  repeated string user_requirements = 8;
+}
+
+message SecondaryStylistSuggestion {
+  string product_id = 1;
+  float current_price = 2;
+  optional float original_price = 3;
+  optional Product product = 4;
+  repeated string user_requirements = 5;
+}
+
+enum StylistSuggestionStatus {
+  STYLIST_SUGGESTION_STATUS_UNSPECIFIED = 0;
+  STYLIST_SUGGESTION_STATUS_WAITING = 1;
+  STYLIST_SUGGESTION_STATUS_ACCEPTED = 2;
+  STYLIST_SUGGESTION_STATUS_MODIFICATION_REQUESTED = 3;
+}
+
+message SendStylistSuggestionsResponse {
+  string order_id = 1;
+  optional string modification_request = 2;
+  optional AcceptedProduct accepted_product = 3;
+}
+
+message AcceptedProduct {
+  string product_id = 1;
+  string size = 2;
+}
+
+message SuggestionReasoning {
+  string product_reasoning = 1;
+  string brand_reasoning = 2;
+  string size_reasoning = 3;
+}
+
+message SearchQuery {
+  string query = 1;
+  optional int32 top_k = 2;
+  optional Gender gender = 3;
+  repeated string brand_ids = 4;
+  optional float min_price = 5;
+  optional float max_price = 6;
+  repeated string product_id_whitelist = 7;
+  repeated string product_id_blacklist = 8;
+  optional ProductCategory category = 9;
+  optional SearchMethod search_method = 10;
+  optional int32 embedding_version = 11;
+}
+
+enum SearchMethod {
+  SEARCH_METHOD_UNSPECIFIED = 0;
+  SEARCH_METHOD_TEXT = 1;
+  SEARCH_METHOD_IMAGE = 2;
+  SEARCH_METHOD_VOYAGE_TEXT = 3;
+  SEARCH_METHOD_IMAGE_TEXT_AVERAGE = 4;
+  SEARCH_METHOD_VOYAGE_MULTIMODAL = 5;
+  SEARCH_METHOD_VOYAGE_TEXT_SIGLIP_IMAGE = 6;
+  SEARCH_METHOD_VOYAGE_TEXT_SIGLIP_IMAGE_AVERAGE = 7;
+  SEARCH_METHOD_VOYAGE_TEXT_SIGLIP_IMAGE_AVERAGE_SPARSE = 8;
+  SEARCH_METHOD_VOYAGE_TEXT_SIGLIP_IMAGE_AVERAGE_SPARSE_CLEAN = 9;
+  SEARCH_METHOD_VOYAGE_TEXT_SIGLIP_IMAGE_AVERAGE_SPARSE_CLEAN_WITH_SEMANTIC_METADATA =
+      10;
+}
+
+message Brand {
+  string id = 1;
+  string company = 2;
+  string url = 3;
+  optional Gender gender = 4;
+  optional string gpt_summary = 5;
+}
+
+message GetBrandsRequest {}
+
+message GetBrandsResponse { repeated Brand brands = 1; }
+
+message CreateBrandRequest { Brand brand = 1; }
+
+message CreateBrandResponse { Brand brand = 1; }
+
+message SearchRequest {
+  SearchQuery query = 1;
+  optional string target_user_id = 2;
+  optional string target_explore_request_id = 3;
+}
+
+message SearchResponse { repeated ProductWithScore results = 1; }
+
+message SimilarProductsRequest {
+  string product_id = 1;
+  optional int32 top_k = 2;
+  optional Gender gender = 3;
+  repeated string brand_ids = 4;
+  optional float min_price = 5;
+  optional float max_price = 6;
+  optional ProductCategory category = 7;
+  optional SearchMethod search_method = 8;
+  optional string explore_request_id = 9;
+  repeated string product_id_blacklist = 10;
+}
+
+message SimilarProductsResponse { repeated ProductWithScore results = 1; }
+
+message StylePickerProduct {
+  string id = 1;
+  string model_image = 2;
+  string sticker_image = 3;
+  ProductCategory category = 4;
+  Gender gender = 5;
+}
+
+message ListStylePickerProductsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  optional ProductCategory category = 3;
+  optional Gender gender = 4;
+}
+
+message ListStylePickerProductsResponse {
+  repeated StylePickerProduct products = 1;
+  int32 total_count = 2;
+}
+
+service BaseService {
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse);
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc GetTextEmbedding(TextEmbeddingRequest) returns (EmbeddingResponse);
+  rpc GetImageEmbedding(ImageEmbeddingRequest) returns (EmbeddingResponse);
+  rpc GenerateStyles(StyleGenerationRequest) returns (StyleGenerationResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
+  rpc GetBrands(GetBrandsRequest) returns (GetBrandsResponse);
+  rpc CreateBrand(CreateBrandRequest) returns (CreateBrandResponse);
+  rpc GetSimilarProducts(SimilarProductsRequest)
+      returns (SimilarProductsResponse);
+  rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
+  rpc GetLatestAcceptableAppVersion(GetLatestAcceptableAppVersionRequest)
+      returns (GetLatestAcceptableAppVersionResponse);
+  rpc SearchForProductsByUrlRegex(SearchForProductsByUrlRegexRequest)
+      returns (SearchForProductsByUrlRegexResponse);
+  rpc ListStylePickerProducts(ListStylePickerProductsRequest)
+      returns (ListStylePickerProductsResponse);
+}
+
+message UpdateProductRequest {
+  string product_id = 1;
+  optional string url = 2;
+  optional float price = 4;
+  optional float original_price = 5;
+  repeated string sizes = 6;
+}
+
+message UpdateProductResponse { Product product = 1; }
+
+message SearchForProductsByUrlRegexRequest { string url_regex = 1; }
+
+message SearchForProductsByUrlRegexResponse { repeated Product products = 1; }
+
+message GetLatestAcceptableAppVersionRequest {}
+
+message GetLatestAcceptableAppVersionResponse {
+  string version = 1;
+  string build_number = 2;
+}
+
+message GetProductsRequest { repeated string product_ids = 1; }
+
+message GetProductsResponse { repeated Product products = 1; }
+
+message ProcessImageExtractAndSaveStyleRequest { string image_url = 1; }
+
+message ProcessImageExtractAndSaveStyleResponse { string style = 1; }
+
+message UploadImageRequest { bytes image_data = 1; }
+
+message UploadImageResponse { string image_url = 1; }
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse { string message = 1; }
+
+message TextEmbeddingRequest { string query = 1; }
+
+message ImageEmbeddingRequest { bytes image_data = 1; }
+
+message EmbeddingResponse { repeated float embedding = 1; }
+
+message StyleGenerationRequest {
+  string query = 1;
+  Gender gender = 2;
+  optional ProductCategory category = 3;
+  optional int32 num_products = 4;
+  optional SearchMethod search_method = 5;
+}
+
+message StyleGenerationResponse { repeated Product results = 1; }
+
+message GetProductRequest { string id = 1; }
+
+message GetProductResponse { Product product = 1; }
+
+message CreateProductRequest { Product product = 1; }
+
+message CreateProductResponse { Product product = 1; }
+
+enum ExploreRequestType {
+  EXPLORE_REQUEST_TYPE_UNSPECIFIED = 0;
+  EXPLORE_REQUEST_TYPE_OUTFIT = 1;
+  EXPLORE_REQUEST_TYPE_ITEM = 2;
+}
+
+message Empty {}
+
+message PinterestImagePreferenceWithStyle {
+  ImagePreferenceItemWithStyle image_preference_item_with_style = 1;
+  string search_query = 2;
+}
+
+message ProductPreferenceToolUsage {
+  string tool_use_id = 1;
+  repeated ProductWithSearchQueryAndPreference preferences = 2;
+}
+
+message PinterestGridToolUsage {
+  string tool_use_id = 1;
+  repeated PinterestImagePreferenceWithStyle image_preference_items = 2;
+}
+
+message PinterestImageGridToolUsage {
+  string tool_use_id = 1;
+  repeated PinterestImagePreferenceWithStyle image_preference_items = 2;
+}
+
+message FinishChatToolUsage {
+  string tool_use_id = 1;
+  repeated string user_requirements = 2;
+  repeated ProductSuggestion product_suggestions = 3;
+}
+
+message ExploreMessageV2 {
+  oneof message {
+    core.Message basic_message = 1;
+    ProductPreferenceToolUsage product_preference_tool_usage = 2;
+    PinterestGridToolUsage pinterest_grid_tool_usage = 3;
+    PinterestImageGridToolUsage pinterest_image_grid_tool_usage = 4;
+    FinishChatToolUsage finish_chat_tool_usage = 5;
+  }
+}
+
+message CardExpirationDate {
+  int32 month = 1;
+  int32 year = 2;
+}
+
+message Card {
+  string id = 1;
+  string card_number = 2;
+  string cvv = 3;
+  string holder_name = 4;
+  CardExpirationDate expiration_date = 5;
+  string billing_address = 6;
+  optional string mailing_address = 7;
+}

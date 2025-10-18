@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package orderManagement;
+
+import "base/base.proto";
+
+message EnrichedOrderDetail {
+  base.OrderSummary order = 1;
+  optional base.ExploreRequest request_chat = 2;
+}
+
+message CreateOrderRequest {
+  optional string customer_id = 1;
+  optional string stylist_id = 2;
+  string chat_id = 3;
+  repeated base.ProductRecommendation product_recommendations = 4;
+  optional string note = 5;
+  optional base.OrderType type = 6;
+}
+
+message CreateOrderResponse { base.OrderSummary order = 1; }
+
+message GetOrderRequest { string order_id = 1; }
+
+message GetOrderResponse { base.OrderSummary order = 1; }
+
+message ListOrdersRequest {
+  optional string customer_id = 1;
+  optional string stylist_id = 2;
+  optional base.OrderStatus status = 3;
+  optional bool should_include_archived_suggestions = 4;
+}
+
+message ListOrdersResponse { repeated base.OrderSummary orders = 1; }
+
+message UpdateOrderRequest {
+  string order_id = 1;
+  optional string stylist_id = 2;
+  optional base.OrderStatus status = 3;
+  optional bool is_starred = 4;
+}
+
+message UpdateOrderResponse { base.OrderSummary order = 1; }
+
+message DeleteOrderRequest { string order_id = 1; }
+
+message DeleteOrderResponse { bool success = 1; }
+
+message GetEnrichedOrderResponse { EnrichedOrderDetail enrichedOrder = 1; }
+
+service OrderManagementService {
+  // Old Flow
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc GetEnrichedOrder(GetOrderRequest) returns (GetEnrichedOrderResponse);
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+  rpc UpdateOrder(UpdateOrderRequest) returns (UpdateOrderResponse);
+  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse);
+
+  // New Flow
+  rpc CreateOrderSuggestion(CreateOrderSuggestionRequest) returns (base.Empty);
+  rpc SubmitOrderSuggestionUserResponse(
+      SubmitOrderSuggestionUserResponseRequest) returns (base.Empty);
+  rpc AddShipmentToOrderSuggestion(AddShipmentToOrderSuggestionRequest)
+      returns (AddShipmentToOrderSuggestionResponse);
+  rpc UpdateShippingInformation(UpdateShippingInformationRequest)
+      returns (base.Empty);
+  rpc DeleteShipment(DeleteShipmentRequest) returns (base.Empty);
+  rpc SubmitProductPurchaseFeedback(SubmitProductPurchaseFeedbackRequest)
+      returns (base.Empty);
+  rpc SubmitProductPurchaseSuggestionFeedback(
+      SubmitProductPurchaseSuggestionFeedbackRequest)
+      returns (SubmitProductPurchaseSuggestionFeedbackResponse);
+  rpc FinalizeOrderSuggestion(FinalizeOrderSuggestionRequest)
+      returns (FinalizeOrderSuggestionResponse);
+  rpc ReplaceOrderSuggestion(ReplaceOrderSuggestionRequest)
+      returns (ReplaceOrderSuggestionResponse);
+  rpc SetSuggestionArchived(SetSuggestionArchivedRequest)
+      returns (SetSuggestionArchivedResponse);
+  rpc PublishDraftSuggestion(PublishDraftSuggestionRequest)
+      returns (PublishDraftSuggestionResponse);
+  rpc GetShipmentIntentInfo(GetShipmentIntentInfoRequest)
+      returns (GetShipmentIntentInfoResponse);
+  rpc UpdateProductPurchase(UpdateProductPurchaseRequest)
+      returns (UpdateProductPurchaseResponse);
+  rpc UpdateOrderSuggestionStylistNote(UpdateOrderSuggestionStylistNoteRequest)
+      returns (UpdateOrderSuggestionStylistNoteResponse);
+  rpc RemoveProductSuggestionFromOrderSuggestion(
+      RemoveProductSuggestionFromOrderSuggestionRequest)
+      returns (RemoveProductSuggestionFromOrderSuggestionResponse);
+  rpc AddProductSuggestionToOrderSuggestion(
+      AddProductSuggestionToOrderSuggestionRequest)
+      returns (AddProductSuggestionToOrderSuggestionResponse);
+  rpc DeleteOrderSuggestions(DeleteOrderSuggestionsRequest)
+      returns (DeleteOrderSuggestionsResponse);
+  rpc ToggleProductPurchaseSuggestionArchived(
+      ToggleProductPurchaseSuggestionArchivedRequest)
+      returns (ToggleProductPurchaseSuggestionArchivedResponse);
+  rpc EditProductPurchaseSuggestion(EditProductPurchaseSuggestionRequest)
+      returns (EditProductPurchaseSuggestionResponse);
+}
+
+message EditProductPurchaseSuggestionRequest {
+  string product_purchase_suggestion_id = 1;
+  optional string product_purchase_id = 2;
+  string size = 3;
+  string color = 4;
+  float price = 5;
+  optional float original_price = 6;
+  optional bool is_refundable = 7;
+  optional base.ProductPurchaseSuggestionStatus status = 8;
+}
+
+message EditProductPurchaseSuggestionResponse {}
+
+message ToggleProductPurchaseSuggestionArchivedRequest {
+  string product_purchase_suggestion_id = 1;
+  optional string product_purchase_id = 2;
+  bool is_archived = 3;
+  string archive_reason = 4;
+}
+
+message ToggleProductPurchaseSuggestionArchivedResponse {}
+
+message DeleteOrderSuggestionsRequest {
+  repeated string order_suggestion_ids = 1;
+}
+
+message DeleteOrderSuggestionsResponse {}
+
+message RemoveProductSuggestionFromOrderSuggestionRequest {
+  string order_suggestion_id = 1;
+  optional string product_suggestion_id = 2;
+  optional string product_purchase_id = 3;
+}
+
+message RemoveProductSuggestionFromOrderSuggestionResponse {}
+
+message AddProductSuggestionToOrderSuggestionRequest {
+  string order_suggestion_id = 1;
+  string product_id = 2;
+  string size = 3;
+  string color = 4;
+}
+
+message AddProductSuggestionToOrderSuggestionResponse {}
+
+message PublishDraftSuggestionRequest { string order_suggestion_id = 1; }
+
+message PublishDraftSuggestionResponse {}
+
+message UpdateOrderSuggestionStylistNoteRequest {
+  string order_suggestion_id = 1;
+  optional string stylist_note = 2;
+}
+
+message UpdateOrderSuggestionStylistNoteResponse {}
+message UpdateProductPurchaseRequest {
+  string product_purchase_id = 1;
+  optional base.RefundStatus refund_status = 2;
+  optional base.PaymentStatus payment_status = 3;
+  optional string stripe_payment_id = 4;
+}
+
+message UpdateProductPurchaseResponse {
+  base.ProductPurchase product_purchase = 1;
+}
+
+message GetShipmentIntentInfoRequest {}
+
+message GetShipmentIntentInfoResponse {
+  string email = 1;
+  base.Card credit_card = 2;
+}
+
+message SetSuggestionArchivedRequest {
+  string order_suggestion_id = 1;
+  bool is_archived = 2;
+}
+
+message SetSuggestionArchivedResponse { string message = 1; }
+
+message ReplaceOrderSuggestionRequest {
+  string order_suggestion_id = 1;
+  repeated NakedProductPurchaseSuggestion product_purchases = 2;
+}
+
+message ReplaceOrderSuggestionResponse {
+  base.PopulatedOrderSuggestion order_suggestion = 1;
+}
+
+message FinalizeOrderSuggestionRequest { string order_suggestion_id = 1; }
+
+message FinalizeOrderSuggestionResponse {
+  base.PopulatedOrderSuggestion order_suggestion = 1;
+}
+
+message DeleteShipmentRequest { string shipment_id = 1; }
+
+message SubmitProductPurchaseFeedbackRequest {
+  string product_purchase_id = 1;
+  repeated base.ProductPurchaseFeedbackCategory categories = 2;
+  optional string feedback = 3;
+  optional bool is_refund_requested = 4;
+}
+
+message SubmitProductPurchaseSuggestionFeedbackRequest {
+  string product_purchase_id = 1;
+  optional string note = 2;
+}
+
+message SubmitProductPurchaseSuggestionFeedbackResponse {
+  base.ProductPurchaseSuggestion product_purchase_suggestion = 1;
+}
+
+message UpdateShippingInformationRequest {
+  string shipment_id = 1;
+  optional string brand_order_number = 2;
+  optional string tracking_number = 3;
+  optional string tracking_url = 4;
+  optional int64 expected_delivery_date_start = 5;
+  optional int64 expected_delivery_date_end = 6;
+  base.ShipmentStatus status = 7;
+  optional string email = 8;
+}
+
+message NakedProductPurchase {
+  string product_id = 1;
+  string size = 2;
+  float price = 3;
+  optional float original_price = 4;
+  optional bool is_refundable = 5;
+  string color = 6;
+}
+
+message AddShipmentToOrderSuggestionRequest {
+  string order_suggestion_id = 1;
+  string brand_id = 2;
+  repeated NakedProductPurchase product_purchases = 3;
+
+  // Order Info
+  optional string brand_order_number = 4;
+
+  // Tracking Info
+  optional string tracking_number = 5;
+  optional string tracking_url = 6;
+  optional int64 expected_delivery_date_start = 7;
+  optional int64 expected_delivery_date_end = 8;
+  optional string shipment_id = 9;
+  optional string credit_card_card_id_to_lock = 10;
+  optional string email = 11;
+  float total_price = 12;
+  optional float shipping_cost = 13;
+}
+
+message AddShipmentToOrderSuggestionResponse { string shipment_id = 1; }
+
+message SubmitOrderSuggestionUserResponseRequest {
+  string order_suggestion_id = 1;
+  repeated string accepted_product_purchase_ids = 2;
+}
+
+message NakedProductPurchaseSuggestion {
+  string product_id = 1;
+  string size = 2;
+  float price = 3;
+  optional float original_price = 4;
+  optional bool is_refundable = 5;
+  string color = 6;
+}
+
+message CreateOrderSuggestionRequest {
+  string order_id = 1;
+  repeated NakedProductPurchaseSuggestion product_purchases = 2;
+  bool is_auto_accepted = 3;
+  optional string stylist_note = 4;
+  bool is_draft = 5;
+}
+
+message CreateOrderSuggestionResponse { base.OrderSummary order = 1; }
+
+message SubmitProductPurchaseRequest { string order_id = 1; }
+
+message SubmitProductPurchaseResponse { bool success = 1; }
+
+message SendShippingEmailRequest {
+  string order_id = 1;
+  string tracking_number = 2;
+  string tracking_url = 3;
+}
+
+message SendShippingEmailResponse { bool success = 1; }

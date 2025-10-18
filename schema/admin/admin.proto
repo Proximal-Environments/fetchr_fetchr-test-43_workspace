@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package admin;
+
+import "base/base.proto";
+
+service AdminService {
+  rpc ScrapeProduct(ScrapeProductRequest) returns (ScrapeProductResponse);
+  rpc GetScrapeStatus(GetScrapeStatusRequest) returns (GetScrapeStatusResponse);
+  rpc ListProductUploads(ListProductUploadsRequest)
+      returns (ListProductUploadsResponse);
+  rpc CreatePendingRegisterUserProfile(CreatePendingRegisterUserProfileRequest)
+      returns (CreatePendingRegisterUserProfileResponse);
+  rpc SendMessageInChat(SendMessageInChatRequest)
+      returns (SendMessageInChatResponse);
+}
+
+message SendMessageInChatRequest {
+  string chat_id = 1;
+  string message = 2;
+}
+
+message SendMessageInChatResponse {}
+
+message CreatePendingRegisterUserProfileRequest {
+  string email = 1;
+  string transcript = 2;
+  string query = 3;
+}
+
+message CreatePendingRegisterUserProfileResponse {}
+
+message ScrapeProductRequest { string url = 1; }
+
+message ScrapeProductResponse {
+  oneof result {
+    string job_id = 1;
+    base.Product product = 2;
+  }
+  string status = 3; // "pending", "completed", or "failed"
+}
+
+message GetScrapeStatusRequest {
+  string job_id = 1;
+  string url = 2; // needed for creating the final product
+}
+
+message GetScrapeStatusResponse {
+  string status = 1; // "pending", "completed", or "failed"
+  optional base.Product product = 2;
+  optional string error = 3;
+}
+
+message ListProductUploadsRequest {
+  // No fields needed - user ID will be extracted from request context
+}
+
+message ProductUpload {
+  string id = 1;
+  string url = 2;
+  string status = 3; // "pending", "completed", or "failed"
+  optional base.Product product = 4;
+  optional string error = 5;
+  int64 created_at = 6;
+}
+
+message ListProductUploadsResponse { repeated ProductUpload uploads = 1; }

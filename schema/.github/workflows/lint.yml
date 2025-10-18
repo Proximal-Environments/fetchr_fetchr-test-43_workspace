@@ -1,0 +1,93 @@
+name: Schema Lint
+
+on:
+  push:
+    paths:
+      - '**'
+  pull_request:
+    paths:
+      - '**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  proto-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for breaking change detection against main
+
+      - name: Initial Slack Notification
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: slack_notification
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C08HTA80EN8",
+              "text": "🚢 ${{ github.actor }} shipped \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" to Schema!",
+              "attachments": [
+                {
+                  "color": "#FFFF00",
+                  "footer": "CI in progress..."
+                }
+              ]
+            }
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Run Buf lint
+        run: buf lint
+
+      - name: Check for breaking changes
+        run: |
+          if [ -n "$GITHUB_BASE_REF" ]; then
+            buf breaking --against ".git#branch=main"
+          else
+            # For push events to main, compare against the previous commit on main
+            PREV_COMMIT=$(git rev-parse HEAD^)
+            buf breaking --against ".git#ref=$PREV_COMMIT"
+          fi
+
+      - name: Update Original Message on Failure
+        if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.update
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C08HTA80EN8",
+              "ts": "${{ steps.slack_notification.outputs.ts }}",
+              "text": "🚢 ${{ github.actor }} shipped \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" to Schema!",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "footer": "❌ FAILED CI"
+                }
+              ]
+            }
+
+      - name: Send Failure Notification to New Channel
+        if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C0892GR3PT5",
+              "text": "❌ CI checks failed for \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" by ${{ github.actor }}",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "footer": "Check workflow logs for details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }
+              ]
+            }

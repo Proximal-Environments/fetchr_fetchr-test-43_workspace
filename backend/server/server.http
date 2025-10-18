@@ -1,0 +1,9 @@
+POST http://localhost:8008/chat
+Content-Type: application/json
+
+{
+    "messages": [{
+        "role": "user",
+        "content": "What is tailwind used for? Explain in 2 sentences"
+    }]
+}

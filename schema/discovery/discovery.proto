@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+import "base/base.proto";
+
+package discovery;
+
+service DiscoveryService {
+  rpc GetDiscoveryProducts(GetDiscoveryProductsRequest) returns (GetDiscoveryProductsResponse);
+  rpc StartDiscoverySession(StartDiscoverySessionRequest) returns (StartDiscoverySessionResponse);
+  rpc ContinueDiscoverySession(ContinueDiscoverySessionRequest) returns (ContinueDiscoverySessionResponse);
+  rpc BookmarkProduct(BookmarkProductRequest) returns (BookmarkProductResponse);
+  rpc UnbookmarkProduct(UnbookmarkProductRequest) returns (UnbookmarkProductResponse);
+  rpc GetBookmarkedProductIds(GetBookmarkedProductIdsRequest) returns (GetBookmarkedProductIdsResponse);
+  rpc ListBookmarkedProducts(ListBookmarkedProductsRequest) returns (ListBookmarkedProductsResponse);
+}
+
+message GetDiscoveryProductsRequest {
+    optional string last_product_id = 1;
+    optional base.ProductCategory category = 2;
+}
+
+message GetDiscoveryProductsResponse { 
+    repeated base.Product products = 1; 
+}
+
+message StartDiscoverySessionRequest {
+    string query = 1;
+    optional string product_id = 2;
+}
+
+message StartDiscoverySessionResponse {
+    repeated base.Product products = 1;
+    string chat_id = 2;
+    repeated string suggested_searches = 3;
+    string response = 4;
+    string category = 5;
+}
+
+message ContinueDiscoverySessionRequest {
+    string chat_id = 1;
+    optional string product_id = 2;
+    optional string message = 3;
+}
+
+message ContinueDiscoverySessionResponse {
+    repeated base.Product products = 1;
+    repeated string suggested_searches = 2;
+    string response = 3;
+    string category = 4;
+}
+
+message BookmarkProductRequest {
+    string product_id = 1;
+    optional string chat_id = 2;
+}
+
+message BookmarkProductResponse {
+}
+
+message UnbookmarkProductRequest {
+    string product_id = 1;
+    optional string chat_id = 2;
+}
+
+message UnbookmarkProductResponse {
+}
+
+message GetBookmarkedProductIdsRequest {
+    string chat_id = 1;
+}
+
+message GetBookmarkedProductIdsResponse {
+    repeated string product_ids = 1;
+}
+
+message ListBookmarkedProductsRequest {
+    optional string last_created_at = 1;
+}
+
+message ListBookmarkedProductsResponse {
+    repeated base.Product products = 1;
+    optional string last_created_at = 2;
+}

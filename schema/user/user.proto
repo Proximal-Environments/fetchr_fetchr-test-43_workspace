@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package user;
+
+import "base/base.proto";
+import "base/user_billing.proto";
+
+message CreateUserProfileRequest {
+  string user_id = 1;
+  optional string first_name = 2;
+  optional string last_name = 3;
+  optional base.Gender gender = 4;
+}
+
+message CreateUserProfileResponse { base.UserProfile user_profile = 1; }
+
+message GetUserProfileRequest { string user_id = 1; }
+
+message GetUserProfileResponse { base.UserProfile user_profile = 1; }
+
+message UpdateUserProfileRequest {
+  string user_id = 1;
+  optional string first_name = 2;
+  optional string last_name = 3;
+  optional base.Gender gender = 4;
+  optional base.UserSizing user_sizing = 5;
+  optional bool onboarding_completed = 6;
+  optional int32 age = 7;
+  optional int32 height = 8;
+  optional int32 weight = 9;
+  optional base.UserAddress address = 10;
+  optional base.UserRole role = 11;
+  repeated string brands_selected = 12;
+  optional base.DiscoveryMethod discovery_method = 13;
+  repeated string style_image_urls = 14;
+  optional string instagram_handle = 16;
+  optional string generated_bio = 17;
+  optional base.PaymentMethodStatus payment_method_status = 18;
+  optional base.WhatBringsYouToFetchr what_brings_you_to_fetchr = 19;
+  repeated string style_picker_product_ids = 20;
+  optional string preferences_and_quirks = 21;
+  optional string selfonboarded_generated_style_description = 22;
+}
+
+message UpdateUserProfileResponse { base.UserProfile user_profile = 1; }
+
+message SetUserPushNotificationsTokenRequest {
+  string user_id = 1;
+  optional string token = 2;
+}
+
+message SetUserPushNotificationsTokenResponse {}
+
+message ListProfilesRequest { optional int32 count = 1; }
+
+message ListProfilesResponse { repeated base.UserProfile user_profiles = 1; }
+
+service UserService {
+  rpc CreateUserProfile(CreateUserProfileRequest)
+      returns (CreateUserProfileResponse);
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  rpc UpdateUserProfile(UpdateUserProfileRequest)
+      returns (UpdateUserProfileResponse);
+  rpc SetUserPushNotificationsToken(SetUserPushNotificationsTokenRequest)
+      returns (SetUserPushNotificationsTokenResponse);
+  rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse);
+  rpc UploadWardrobePictures(UploadWardrobePicturesRequest)
+      returns (UploadWardrobePicturesResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc SendOnboardingNotification(SendOnboardingNotificationRequest)
+      returns (SendOnboardingNotificationResponse);
+  rpc UpdateStripeCustomerId(UpdateStripeCustomerIdRequest)
+      returns (UpdateStripeCustomerIdResponse);
+  rpc AnalyzeUserStyle(AnalyzeUserStyleRequest)
+      returns (AnalyzeUserStyleResponse);
+}
+
+message UpdateStripeCustomerIdRequest {
+  string user_id = 1;
+  optional string stripe_customer_id = 2;
+}
+
+message UpdateStripeCustomerIdResponse {}
+
+message SendOnboardingNotificationRequest {}
+
+message SendOnboardingNotificationResponse {}
+
+message DeleteUserRequest { optional string user_id = 1; }
+
+message DeleteUserResponse {}
+
+message UploadWardrobePicturesRequest {
+  string user_id = 1;
+  repeated bytes pictures = 2;
+}
+
+message UploadWardrobePicturesResponse { bool success = 1; }
+
+message AnalyzeUserStyleRequest {
+  string user_id = 1;
+}
+
+message AnalyzeUserStyleResponse {
+  repeated string core_brands = 1;           
+  string brand_analysis = 2;                 
+  string style_analysis = 3;                 
+  repeated string core_stickers = 4;         
+  optional string preferences_analysis = 5;  
+}

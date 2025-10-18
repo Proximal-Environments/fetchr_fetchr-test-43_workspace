@@ -1,0 +1,1 @@
+act -j lint

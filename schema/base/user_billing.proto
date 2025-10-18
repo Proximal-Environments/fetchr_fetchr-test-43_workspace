@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package base;
+
+enum PaymentMethodStatus {
+  PAYMENT_METHOD_STATUS_UNSPECIFIED = 0;
+  PAYMENT_METHOD_STATUS_VALID = 1;
+  PAYMENT_METHOD_STATUS_NO_PAYMENT_METHOD = 2;
+  PAYMENT_METHOD_STATUS_EXPIRED = 3;
+}
+
+// Defines the frequency of subscription payments
+enum SubscriptionCadence {
+  SUBSCRIPTION_CADENCE_UNSPECIFIED = 0;
+  SUBSCRIPTION_CADENCE_MONTHLY = 1;
+  SUBSCRIPTION_CADENCE_QUARTERLY = 2;
+  SUBSCRIPTION_CADENCE_ANNUALLY = 3;
+}
+
+// Common subscription fields
+message SubscriptionDetails {
+  SubscriptionCadence cadence = 1;
+  int64 expiration_date = 2;
+}
+
+// Provider-specific subscription details
+message StripeSubscription {
+  string subscription_id = 1;
+  string customer_id = 2;
+  SubscriptionDetails details = 3;
+}
+
+message RevenueCatSubscription { SubscriptionDetails details = 1; }
+
+message UserSubscription {
+  optional StripeSubscription stripe_subscription = 3;
+  optional RevenueCatSubscription revenue_cat_subscription = 4;
+}
+
+message UserBilling {
+  optional string stripe_customer_id = 1;
+  optional PaymentMethodStatus payment_method_status = 2;
+  optional UserSubscription subscription = 3;
+}

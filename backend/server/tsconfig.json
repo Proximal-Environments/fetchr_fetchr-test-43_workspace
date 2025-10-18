@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "declaration": true,
+        "isolatedModules": true,
+        "target": "es2022",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "jsx": "react",
+        "jsxFactory": "Priompt.createElement",
+        "jsxFragmentFactory": "Priompt.Fragment",
+        "strictPropertyInitialization": true,
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "@fetchr/schema/*": ["./src/proto/*"],
+            "@prisma/client": ["./node_modules/.prisma/client/index.js"]
+        }
+    },
+}

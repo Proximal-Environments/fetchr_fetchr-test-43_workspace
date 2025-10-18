@@ -1,0 +1,10 @@
+{
+  "name": "fetchr-backend",
+  "displayName": "Fetchr Backend",
+  "description": "Full-stack backend with Node.js server and Python AI services for the Fetchr platform",
+  "baseImage": "node",
+  "localSource": true,
+  "repository": {
+    "url": "file://local"
+  }
+}

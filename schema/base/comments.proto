@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package comments;
+
+enum ThreadType {
+  THREAD_TYPE_UNSPECIFIED = 0;
+  THREAD_TYPE_WARNING = 1;
+  THREAD_TYPE_COMMENT = 2;
+  THREAD_TYPE_ISSUE = 3;
+}
+
+message Message {
+  int32 id = 1;
+  string content = 2;
+  string user_id = 3;
+  string user_name = 4;
+  int64 created_at = 5;
+}
+
+message Thread {
+  int32 id = 1;
+  ThreadType type = 2;
+  int64 created_at = 3;
+  repeated Message messages = 4;
+  ThreadStatus status = 5;
+}
+
+enum ThreadStatus {
+  THREAD_STATUS_UNSPECIFIED = 0;
+  THREAD_STATUS_OPEN = 1;
+  THREAD_STATUS_RESOLVED = 2;
+  THREAD_STATUS_NOT_APPLICABLE = 3;
+}

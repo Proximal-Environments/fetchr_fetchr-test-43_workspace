@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package notifications;
+
+enum DevicePlatform {
+  DEVICE_PLATFORM_UNSPECIFIED = 0;
+  DEVICE_PLATFORM_IOS = 1;
+  DEVICE_PLATFORM_ANDROID = 2;
+  DEVICE_PLATFORM_WEB = 3;
+}
+
+message UserDevice {
+  string id = 1;
+  string user_id = 2;
+  string device_token = 3;
+  DevicePlatform platform = 4;
+  bool is_active = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+message RegisterDeviceRequest {
+  string user_id = 1;
+  string device_token = 2;
+  DevicePlatform platform = 3;
+}
+
+message RegisterDeviceResponse { UserDevice device = 1; }
+
+message UnregisterDeviceRequest {
+  string device_token = 1;
+  optional string user_id = 2;
+}
+
+message UnregisterDeviceResponse { bool success = 1; }
+
+message ListUserDevicesRequest { string user_id = 1; }
+
+message ListUserDevicesResponse { repeated UserDevice devices = 1; }
+
+message SendNotificationRequest {
+  string user_id = 1;
+  string title = 2;
+  string body = 3;
+  optional string deep_link = 4;
+  map<string, string> data = 5;
+}
+
+message SendNotificationResponse {
+  bool success = 1;
+  int32 successful_devices = 2;
+  int32 failed_devices = 3;
+  repeated string failed_device_tokens = 4;
+}
+
+service NotificationsService {
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+  rpc UnregisterDevice(UnregisterDeviceRequest)
+      returns (UnregisterDeviceResponse);
+  rpc ListUserDevices(ListUserDevicesRequest) returns (ListUserDevicesResponse);
+  rpc CheckDeviceNotificationStatus(CheckDeviceNotificationStatusRequest)
+      returns (CheckDeviceNotificationStatusResponse);
+}
+
+message CheckDeviceNotificationStatusRequest {
+  string device_token = 1;
+  string user_id = 2;
+}
+
+message CheckDeviceNotificationStatusResponse {
+  bool is_registered = 1;
+  int64 last_activity_timestamp = 2;
+}

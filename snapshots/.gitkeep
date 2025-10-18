@@ -1,0 +1,6 @@
+# Database snapshots for fetchr-backend environment
+# Add snapshot files here and update Dockerfile.rollout with:
+# COPY snapshots/ /root/workspace/snapshots/
+
+
+

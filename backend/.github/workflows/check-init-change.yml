@@ -1,0 +1,38 @@
+name: Check Init Script Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'init.sh'
+  pull_request:
+    paths:
+      - 'init.sh'
+  workflow_dispatch:
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check version update
+        run: |
+          if ! git diff --quiet HEAD^ HEAD -- init.sh; then
+            # File was changed, get versions from both commits
+            OLD_VERSION=$(git show HEAD^:init.sh | grep "^# Version:" | cut -d' ' -f3)
+            NEW_VERSION=$(git show HEAD:init.sh | grep "^# Version:" | cut -d' ' -f3)
+            
+            if [ "$NEW_VERSION" = "$OLD_VERSION" ]; then
+              echo "Error: init.sh was modified but version number was not updated"
+              echo "Current version: $OLD_VERSION"
+              exit 1
+            else
+              echo "Version was properly updated from $OLD_VERSION to $NEW_VERSION"
+            fi
+          else
+            echo "No changes detected in init.sh"
+          fi

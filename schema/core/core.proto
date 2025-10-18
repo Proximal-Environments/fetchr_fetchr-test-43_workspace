@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package core;
+
+enum EmbeddingModel {
+  EMBEDDING_MODEL_SIGLIP = 0;
+  EMBEDDING_MODEL_TEXT_EMBEDDING_3_LARGE = 1;
+  EMBEDDING_MODEL_VOYAGE_LARGE_3 = 2;
+  EMBEDDING_MODEL_VOYAGE_LARGE_3_MULTIMODAL = 3;
+}
+
+enum VoyageEmbeddingModel {
+  VOYAGE_LARGE_3 = 0;
+}
+
+enum OpenAIEmbeddingModel {
+  TEXT_EMBEDDING_3_LARGE = 0;
+}
+
+enum LLMProvider {
+  LLM_PROVIDER_OPENAI = 0;
+  LLM_PROVIDER_ANTHROPIC = 1;
+}
+
+enum AnthropicModel {
+  CLAUDE_3_5_SONNET_LATEST = 0;
+  CLAUDE_3_7_SONNET_LATEST = 1;
+}
+
+enum OpenAIModel {
+  GPT_4O = 0;
+  GPT_3_5_TURBO = 1;
+  O1_MINI = 2;
+  O1_PREVIEW = 3;
+  O1 = 4;
+  O3_MINI = 5;
+  GPT_4_1_MINI = 6;
+  GPT_4_1_NANO = 7;
+  GPT_4_1 = 8;
+  O4_MINI = 9;
+  O3 = 10;
+}
+
+enum GroqModel {
+  GROQ_LLAMA_4_SCOUT_17B_16E_INSTRUCT = 0; // Meta, 131K context, 8K completion
+  GROQ_LLAMA_4_MAVERICK_17B_128E_INSTRUCT =
+      1;                                  // Meta, 131K context, 8K completion
+  GROQ_DEEPSEEK_R1_DISTILL_LLAMA_70B = 2; // DeepSeek, 128K context
+  GROQ_ALLAM_2_7B = 3;                    // SDAIA, 4K context
+  GROQ_MISTRAL_SABA_24B = 4;              // Mistral, 32K context
+  GROQ_QWEN_QWQ_32B = 5;                  // Alibaba Cloud, 128K context
+  GROQ_PLAYAI_TTS = 6;                    // Playht, 10K context
+  GROQ_PLAYAI_TTS_ARABIC = 7;             // Playht, 10K context
+}
+
+enum MessageRole {
+  MESSAGE_ROLE_USER = 0;
+  MESSAGE_ROLE_SYSTEM = 1;
+  MESSAGE_ROLE_ASSISTANT = 2;
+}
+
+message Message {
+  string content = 1;
+  MessageRole role = 2;
+  repeated bytes images = 3;
+  repeated string image_urls = 4;
+}

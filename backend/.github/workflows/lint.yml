@@ -1,0 +1,167 @@
+name: Backend Lint
+
+on:
+  push:
+    paths:
+      - '**'
+  pull_request:
+    paths:
+      - '**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for breaking change detection against main
+
+      - name: Initial Slack Notification
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: slack_notification
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C08HTA80EN8",
+              "text": "🚢 ${{ github.actor }} shipped \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" to Backend!",
+              "attachments": [
+                {
+                  "color": "#FFFF00",
+                  "footer": "CI in progress..."
+                }
+              ]
+            }
+
+      - name: Check for locked files
+        run: |
+          # Get changed files
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          fi
+
+          # Check each changed file for the locked file marker
+          LOCKED_FILES_CHANGED=false
+          for file in $CHANGED_FILES; do
+            if [ -f "$file" ] && head -n 1 "$file" | grep -q "// __LOCKED_FILE__"; then
+              echo "⛔ LOCKED FILE MODIFIED: $file"
+              LOCKED_FILES_CHANGED=true
+            fi
+          done
+
+          # Fail if any locked files were changed
+          if [ "$LOCKED_FILES_CHANGED" = true ]; then
+            echo "::error::Locked files were modified. CI check failed."
+            exit 1
+          fi
+
+          echo "✅ No locked files were modified"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.12.0'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          # run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        working-directory: server
+        run: pnpm -r install
+
+      - name: Generate Prisma Client
+        working-directory: server
+        run: pnpm run db:update
+
+      - name: Build Server & Dependencies
+        working-directory: server
+        run: pnpm run build
+
+      - name: Run linter
+        working-directory: server
+        run: pnpm run lint
+
+      - name: Type check
+        working-directory: server
+        run: pnpm run type-check
+
+      - name: Update Shipped Message on Success
+        if: success() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.update
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C08HTA80EN8",
+              "ts": "${{ steps.slack_notification.outputs.ts }}",
+              "text": "🚢 ${{ github.actor }} shipped \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" to Backend!",
+              "attachments": [
+                {
+                  "color": "good",
+                  "footer": "✅ CI passed successfully"
+                }
+              ]
+            }
+
+      - name: Update Shipped Message on Failure
+        if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.update
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C08HTA80EN8",
+              "ts": "${{ steps.slack_notification.outputs.ts }}",
+              "text": "🚢 ${{ github.actor }} shipped \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" to Backend!",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "footer": "❌ FAILED CI"
+                }
+              ]
+            }
+
+      - name: Send Failure Notification to CI Channel
+        if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: xoxb-5229797501522-8595065934770-gk0kWosbv2MmCFLNPftRvVTY
+          payload: |
+            {
+              "channel": "C0892GR3PT5",
+              "text": "❌ CI checks failed for \"<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\" by ${{ github.actor }}",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "footer": "Check workflow logs for details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }
+              ]
+            }
