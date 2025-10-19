@@ -1,9 +1,8 @@
 # Template Base Image for Fetchr Environments
 # This image contains fetchr-specific system setup and runtime dependencies
-# Inherits from workspace-base-node which has Node.js, Python, Redis, SSH, etc.
+# Inherits from workspace-base which has Node.js, Python, Redis, SSH, etc.
 
-ARG BASE_IMAGE=workspace-base-node
-FROM ${BASE_IMAGE}
+FROM us-west1-docker.pkg.dev/proximal-core-0/environments/workspace-base:latest
 
 # ========================================
 # Layer 1: System dependencies (rarely changes)
