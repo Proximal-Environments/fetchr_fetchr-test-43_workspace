@@ -1,10 +1,5 @@
-# Use the Node.js base image which includes Git authentication
-ARG BASE_IMAGE=workspace-base-node
-FROM ${BASE_IMAGE}
-
-# ========================================
-# Layer 1: Clone repository (with automatic authentication)
-# ========================================
+# Use the GCP base image with password-only SSH authentication
+FROM us-west1-docker.pkg.dev/proximal-core-0/environments/base:latest
 
 # ========================================
 # Layer 1: System dependencies (rarely changes)
