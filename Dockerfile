@@ -61,75 +61,11 @@ ENV PATH="/root/.nvm/versions/node/v20.12.0/bin:${PATH}"
 # Layer 4: Workspace structure (already cloned above)
 # ========================================
 
-# Note: Repository already cloned with authentication earlier
-
 # Create workspace directory structure
 RUN mkdir -p /root/workspace/backend/server \
              /root/workspace/backend/python_server \
              /root/workspace/schema \
              /root/workspace/snapshots
-
-# ========================================
-# Layer 5: Python dependencies (changes when requirements.txt changes)
-# ========================================
-
-COPY backend/python_server/requirements.txt /root/workspace/backend/python_server/requirements.txt
-
-# Install main backend Python requirements
-WORKDIR /root/workspace/backend
-RUN eval "$(pyenv init -)" && pip install --timeout=1000 -r requirements.txt
-
-# Install python_server specific requirements
-WORKDIR /root/workspace/backend/python_server
-RUN eval "$(pyenv init -)" && pip install --timeout=1000 -r requirements.txt
-
-# ========================================
-# Layer 6: Node.js dependencies (changes when package.json/lock changes)
-# ========================================
-
-COPY backend/server/pnpm-lock.yaml /root/workspace/backend/server/pnpm-lock.yaml
-
-# Install Node.js dependencies
-WORKDIR /root/workspace/backend/server
-
-# Create modified package.json without problematic postinstall script
-RUN cp package.json package.json.backup && \
-    node -e "const pkg = require('./package.json'); delete pkg.scripts.postinstall; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-
-# Install Node dependencies using exact versions
-RUN pnpm install --frozen-lockfile || pnpm install
-
-# Restore original package.json but create a fixed version for runtime
-RUN mv package.json.backup package.json && \
-    node -e "const pkg = require('./package.json'); pkg.scripts.postinstall = 'echo \"Python deps already installed during build, skipping postinstall\"'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-
-# ========================================
-# Layer 7: Source code and build (changes frequently)
-# ========================================
-
-# Generate protocol buffers (schema should be at ../../schema from here)
-WORKDIR /root/workspace/backend/server
-RUN if [ -d "../../schema" ]; then \
-        mkdir -p src/proto && \
-        protoc --experimental_allow_proto3_optional \
-               --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \
-               --ts_proto_out=src/proto \
-               --ts_proto_opt=outputServices=generic-definitions,outputServices=nice-grpc,outputClientImpl=false,oneof=unions,snakeToCamel=true,esModuleInterop=true,lowerCaseServiceMethods=true,useExactTypes=true,outputPartialMethods=false \
-               --proto_path=../../schema \
-               ../../schema/**/*.proto || echo "Proto generation failed, continuing..."; \
-    fi
-
-# Generate Prisma client (if schema.prisma exists)
-RUN if [ -f "schema.prisma" ]; then \
-        pnpm run prisma:generate || echo "Prisma generation failed, continuing..."; \
-    fi
-
-# Build the project
-RUN pnpm run build || echo "Build failed, continuing for debugging..."
-
-# ========================================
-# Layer 8: Runtime setup (rarely changes)
-# ========================================
 
 # Go back to workspace root for task execution
 WORKDIR /root/workspace
